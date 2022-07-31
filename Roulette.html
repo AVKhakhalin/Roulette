@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+<p>Игра "Рулетка"</p>
+
+<script language="JavaScript">
+// Игра РУЛЕТКА
+// 		Приветствие и ввод начальных данных
+alert('Здравствуйте!\nВам предлагается сыграть в рулетку. На старте у Вас есть 1000 кредитов. Вы можете ставить на любое число от 0 до 36 и(или) на цвет \"Чёрный\" или \"Красный\" сумму, не превышающую имеющееся у Вас в данный момент количество кредитов. Для ставки нужно выбрать одно из чисел в диапазоне от 0 до 36 включительно или цвет \"Красный\" или \"Чёрный\". Выигрыш в рулетке при угадывании цвета равен двум ставкам, при угадывании числа 35-ти ставкам. Для начала игры нужно нажать на кнопку \"Ok\" или клавишу \"Enter\", или \"Пробел\".\nДля выхода из игры нужно набрать слово \"quit"\ или полностью потратить все имеющиеся кредиты. Желаю Вам удачи!');
+let exit = false;
+let kredits = 1000;
+let stake = '';
+let stakeArray = [];
+let stakeNumberArray = [];
+let result;
+let resultColor;
+
+// 		Игровой цикл
+while(true)
+{
+  stake = prompt('У Вас есть ' + kredits + ' ' + kreditRusString(kredits) + '\n\nДелайте ставку, введя через запятую без пробела три числа А,Б,В:\nА) РАЗМЕР СТАВКИ: целое положительное число;\nБ) ЧИСЛО: от 0 до 36; -1 - на число нет ставки,\nВ) ЦВЕТ: 0 - \"Чёрный\"; 1 - \"Красный\"; -1 - на цвет нет ставки\nМожно пропустить ход, указав размер ставки 0 (например, 0,0,-1 или 0,-1,0).\nСтавить одновременно и на число, и на цвет нельзя (30,1,1).\nОбразец ставки 30 кредитов на число 1: 30,1,-1\nОбразец ставки 30 кредитов на цвет \"Красный\": 30,-1,1');
+  if (stake.toLowerCase() == 'quit')
+  {
+    alert('Игра завершена.\nВаш баланс ' + kredits + ' ' + kreditRusString(kredits) + '.\nСпасибо Вам за игру!');
+    break;
+  }
+
+  stakeArray = stake.split(',');
+  stakeNumberArray = stakeArray.map
+  (
+      function(element)
+      {
+          return parseInt(element);
+      }
+  );
+
+  //	Анализ ставки
+  if ((stakeNumberArray.length) && (stakeNumberArray.length == 3) && (isNaN(stakeNumberArray[0]) == false) && (isNaN(stakeNumberArray[1]) == false) && (isNaN(stakeNumberArray[2]) == false) && (((stakeNumberArray[1] == -1) && (stakeNumberArray[2] != -1)) || ((stakeNumberArray[1] != -1) && (stakeNumberArray[2] == -1))) && (stakeNumberArray[0] <= kredits) && (stakeNumberArray[0] >= 0))
+  {
+      result = newRandNumber();
+      if ((stakeNumberArray[1] == result) || (stakeNumberArray[2] == colorDeterm(result)))
+      {
+        	if (stakeNumberArray[2] == -1)
+            {
+              	kredits += stakeNumberArray[0] * 35;
+	      		alert('Вы ВЫИГРАЛИ ' + (stakeNumberArray[0] * 35) + ' ' + kreditRusString(stakeNumberArray[0] * 35) + '!\nВыпало число ' + result + ', ' + colorDetermString(colorDeterm(result)) + '\n' + stakeObjectString(stakeNumberArray) + '\nВаша ставка - ' + stakeNumberArray[0] + ' ' + kreditRusString(stakeNumberArray[0]) + '.\nВаш выигрыш - ' + (stakeNumberArray[0] * 35) + ' ' + kreditRusString(stakeNumberArray[0] * 35) + '.\nВаш баланс - ' + kredits + ' ' + kreditRusString(kredits) + '.');
+            }
+        	else
+            {
+              	kredits += stakeNumberArray[0] * 2;
+	      		alert('Вы ВЫИГРАЛИ ' + (stakeNumberArray[0] * 2) + ' ' + kreditRusString(stakeNumberArray[0] * 2) + '!\nВыпало число ' + result + ', ' + colorDetermString(colorDeterm(result)) + '\n' + stakeObjectString(stakeNumberArray) + '\nВаша ставка - ' + stakeNumberArray[0] + ' ' + kreditRusString(stakeNumberArray[0]) + '.\nВаш выигрыш - ' + (stakeNumberArray[0] * 2) + ' ' + kreditRusString(stakeNumberArray[0] * 2) + '.\nВаш баланс - ' + kredits + ' ' + kreditRusString(kredits) + '.');
+            }
+      }
+      else
+      {
+           	kredits -= stakeNumberArray[0];
+     		if (stakeNumberArray[0] > 0)
+            {
+        		alert('Вы проиграли ' + stakeNumberArray[0] + ' ' + kreditRusString(stakeNumberArray[0]) + '.\nВыпало число ' + result + ', ' + colorDetermString(colorDeterm(result)) + '\n' + stakeObjectString(stakeNumberArray) + '\nВаша ставка - ' + stakeNumberArray[0] + ' ' + kreditRusString(stakeNumberArray[0]) + '.\nВаш баланс - ' + kredits + ' ' + kreditRusString(kredits) + '.');
+            }
+        	else
+            {
+        		alert('Выпало число ' + result + ', ' + colorDetermString(colorDeterm(result)) + '\nВаш баланс - ' + kredits + ' ' + kreditRusString(kredits) + '.');
+            }
+            if (kredits <= 0)
+            {
+              	alert('Игра завершена.\nВаш баланс ' + kredits + ' ' + kreditRusString(kredits) + '.\nСпасибо Вам за игру!');
+              	break;
+            }
+      }
+  }
+  else
+  {
+      alert('Вы сделали некорректную ставку.\nПопробуйте ещё раз.');
+  }
+} 
+
+//		Функция для генерации случайного числа от 0 до 36
+function newRandNumber()
+{
+  	return Math.round(Math.random() * 36);
+}
+
+//		Функция для определения цвета по числу
+function colorDeterm(number)
+{
+    if (number == 0)
+    {
+      	return -1;
+    }  
+    else if ((number == 11) || (number == 13) || (number == 15) || (number == 17) || (number == 29) || (number == 31) || (number == 33) || (number == 35))
+    {
+        return 0;
+    }
+    else if ((number == 12) || (number == 14) || (number == 16) || (number == 18) || (number == 30) || (number == 32) || (number == 34) || (number == 36))
+    {
+        return 1;
+    }
+    else
+    {
+      	return number % 2;
+    }
+}
+
+//		Функция для вывода цвета словами
+function colorDetermString(number)
+{
+    if (number == 0)
+    {
+      	return 'цвет \"Чёрный\".';
+    }  
+    else if (number == 1)
+    {
+        return 'цвет \"Красный\".';
+    }
+    else
+    {
+      	return 'цвета нет.';
+    }
+}
+
+//		Фукнция вывода объекта ставки
+function stakeObjectString(stakeNumberArray)
+{
+    if (stakeNumberArray[1] == -1)
+    {
+      	return 'Объект ставки - ' + colorDetermString(stakeNumberArray[2]);
+    }
+    else
+    {
+      	return 'Объект ставки - число ' + stakeNumberArray[1] + '.';
+    }
+}
+
+//		Функция вывода окончания слова кредит
+function kreditRusString(kreditValue)
+{
+    let kreditValLastStr = String(kreditValue);
+    kreditValLastStr = kreditValLastStr[kreditValLastStr.length - 1];
+    return kreditRusStrShort(Number(kreditValLastStr));
+}
+
+//		Функция вывода окончания слова кредит (< 10)
+function kreditRusStrShort(kreditValue)
+{
+    if (kreditValue == 1)
+    {
+      	return 'кредит';
+    }
+    else if ((kreditValue == 2) || (kreditValue == 3) || (kreditValue == 4))
+    {
+      	return 'кредита';
+    }
+    else
+    {
+      	return 'кредитов';
+    } 
+}
+</script>
+
+<p>Всего доброго.</p>
+<p>Спасибо за игру!<BR></BR></p>
+<p>Разработчик - Хахалин Андрей Владимирович.</p>
+<p>Контактная информация:<BR>Telegram: @avkhakhalin<BR>E-mail: avkhakhalin@mail.ru</BR></BR></p>
+
+</body>
+</html>
